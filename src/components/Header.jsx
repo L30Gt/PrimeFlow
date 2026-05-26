@@ -1,15 +1,17 @@
 import React from 'react';
 import { Search, SlidersHorizontal, Settings2 } from 'lucide-react';
 
-const Header = () => {
+const Header = ({ currentProject }) => {
+  const projectName = currentProject?.name || 'Selecione um projeto';
+  
   return (
     <header className="px-7 pt-5 pb-[18px] bg-prime-white border-b border-prime-branco-bord flex items-end justify-between gap-5 shrink-0">
       <div className="flex-1 min-w-0">
         <div className="text-[13px] font-medium text-prime-preto-50 mb-1">
-          Projeto / <strong className="font-bold text-prime-preto">Nome do Projeto 1</strong>
+          Projeto / <strong className="font-bold text-prime-preto">{projectName}</strong>
         </div>
         <h1 className="text-[24px] font-semibold text-prime-preto leading-[1.2]">
-          Projeto: Nome do Projeto 1
+          Projeto: {projectName}
         </h1>
       </div>
       <div className="flex items-center gap-3 shrink-0">

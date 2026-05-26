@@ -1,7 +1,16 @@
-import { tasks as initialTasks, columns as initialColumns } from '../dados';
+import { tasks as initialTasks, columns as initialColumns, projects as initialProjects } from '../dados';
 
 let tasks = [...initialTasks];
 let columns = [...initialColumns];
+let projects = [...initialProjects];
+
+export const getProjects = () => {
+  return projects;
+};
+
+export const getProjectById = (projectId) => {
+  return projects.find(p => p.id === projectId);
+};
 
 export const getColumnsData = () => {
   return columns.map(col => ({
