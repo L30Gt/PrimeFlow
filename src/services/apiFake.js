@@ -40,3 +40,16 @@ export const deleteTask = (taskId) => {
     col.taskIds = col.taskIds.filter(id => id !== taskId);
   });
 };
+
+export const createColumn = (title, projectId) => {
+  const newCol = {
+    id: `col-${Math.floor(Math.random() * 10000)}`,
+    projectId,
+    title,
+    taskIds: [],
+    createdAt: new Date().toISOString()
+  };
+  columns.push(newCol);
+  return newCol;
+};
+
