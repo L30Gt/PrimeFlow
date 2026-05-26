@@ -1,7 +1,19 @@
 import React from 'react';
+import { users } from '../dados';
 import { LogOut, Settings } from 'lucide-react';
 
 const Sidebar = () => {
+  const currentUser = users[0];
+  const initials = currentUser?.name
+    ? currentUser.name
+        .split(' ')
+        .filter(Boolean)
+        .map((part) => part[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
+    : 'X';
+
   return (
     <aside className="w-sidebar min-h-screen bg-prime-white border-r border-prime-branco-bord flex flex-col shrink-0 sticky top-0 h-screen">
       <div className="flex items-center gap-2.5 px-5 pt-6 pb-5 border-b border-prime-branco-bord">
@@ -18,11 +30,11 @@ const Sidebar = () => {
 
       <div className="flex items-center gap-2.5 py-3.5 px-5 border-b border-prime-branco-bord">
         <div className="w-9 h-9 rounded-full bg-prime-azul text-white grid place-items-center text-[13px] font-bold shrink-0">
-          R
+          {initials}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[14px] font-semibold text-prime-preto leading-[1.3]">Rodrigo Faro</div>
-          <div className="text-[11px] text-prime-preto-50 mt-[1px]">Gerente de Projetos</div>
+          <div className="text-[14px] font-semibold text-prime-preto leading-[1.3]">{currentUser?.name ?? 'Usuário'}</div>
+          <div className="text-[11px] text-prime-preto-50 mt-[1px]">{currentUser?.role ?? 'Cargo'}</div>
         </div>
         <button className="w-7 h-7 rounded-md border-none bg-transparent grid place-items-center cursor-pointer text-prime-preto-50 hover:text-prime-preto hover:bg-prime-branco-bord transition-colors" title="Sair">
           <LogOut className="w-4 h-4" />

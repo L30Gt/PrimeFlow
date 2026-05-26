@@ -13,11 +13,10 @@ const TaskColumn = ({ title, count, tasks, onCardClick }) => {
       </div>
 
       <div className="p-3.5 flex flex-col gap-3 overflow-y-auto max-h-[calc(100vh-200px)]">
-        {tasks.map((task, index) => (
-          <TaskCard
-            key={index}
-            title={task.title}
-            id={task.id}
+        {tasks.map((task) => (
+          <TaskCard 
+            key={task.id} 
+            task={task}
             onClick={() => onCardClick(task)}
           />
         ))}
