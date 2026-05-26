@@ -4,33 +4,33 @@ import { users } from '../dados';
 
 const TaskCard = ({ task, onClick }) => {
   // Buscar a inicial do primeiro assignee mockado
-  const firstAssignee = task.assignees?.length > 0 
-    ? users.find(u => u.id === task.assignees[0]) 
+  const firstAssignee = task.assignees?.length > 0
+    ? users.find(u => u.id === task.assignees[0])
     : null;
-    
+
   // Formatar data mockada
-  const formattedDate = task.endDate 
-    ? new Date(task.endDate).toLocaleDateString('pt-BR') 
+  const formattedDate = task.endDate
+    ? new Date(task.endDate).toLocaleDateString('pt-BR')
     : 'DD/MM/AAAA';
 
   return (
-    <div 
+    <div
       className="bg-prime-card-bg rounded-card p-4 pb-3.5 flex flex-col gap-2 cursor-pointer transition-shadow hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
       onClick={onClick}
     >
       <div className="text-[15px] font-bold text-prime-preto leading-[1.4]">
         {task.title || 'Um título de tarefa do projeto.'}
       </div>
-      
+
       <div>
         <div className="inline-flex items-center gap-[5px] border border-prime-azul rounded-prazo px-2 py-0.5 text-[11px] text-prime-azul">
           <Calendar className="w-[11px] h-[11px] shrink-0" />
           {formattedDate}
         </div>
       </div>
-      
+
       <hr className="border-none border-t border-[#e0e0e0] my-1" />
-      
+
       <div className="flex items-center justify-between">
         <span className="text-[14px] font-normal text-prime-preto">{task.id}</span>
         <div className="flex items-center gap-2">

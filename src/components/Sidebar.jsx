@@ -18,12 +18,7 @@ const Sidebar = () => {
     <aside className="w-sidebar min-h-screen bg-prime-white border-r border-prime-branco-bord flex flex-col shrink-0 sticky top-0 h-screen">
       <div className="flex items-center gap-2.5 px-5 pt-6 pb-5 border-b border-prime-branco-bord">
         <div className="w-11 h-11 rounded-logo bg-prime-azul-logo shadow-[10px_5px_20px_5px_rgba(0,0,0,0.10)] shrink-0 grid place-items-center">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-white">
-            <rect x="3" y="3" width="8" height="8" rx="2" fill="white"/>
-            <rect x="13" y="3" width="8" height="8" rx="2" fill="white" fillOpacity=".6"/>
-            <rect x="3" y="13" width="8" height="8" rx="2" fill="white" fillOpacity=".6"/>
-            <rect x="13" y="13" width="8" height="8" rx="2" fill="white" fillOpacity=".3"/>
-          </svg>
+          <img src="/logo.svg" alt="PrimeFlow logo" className="w-full h-full object-contain" />
         </div>
         <span className="text-[20px] font-bold text-prime-preto">PrimeFlow</span>
       </div>

@@ -1,32 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import TaskColumn from './TaskColumn';
-import { columns as initialColumns, tasks as initialTasks } from '../dados';
+import TaskModal from './TaskModal';
+import { getColumnsData, saveTask, deleteTask } from '../services/apiFake';
 
-const Board = ({ onCardClick }) => {
+const Board = () => {
   const [columnsData, setColumnsData] = useState([]);
-  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  const loadData = () => {
+    setColumnsData(getColumnsData());
+  };
+
   useEffect(() => {
-    // Simula a união relacional entre Colunas e Tarefas
-    const mappedColumns = initialColumns.map(col => {
-      return {
-        ...col,
-        tasks: col.taskIds.map(taskId => initialTasks.find(t => t.id === taskId)).filter(Boolean)
-      };
-    });
-    setColumnsData(mappedColumns);
+    loadData();
   }, []);
+
+  const handleCardClick = (task) => {
+    setSelectedTask(task);
+    setIsModalOpen(true);
+  };
+
+  const handleAddCard = (columnId) => {
+    // Passa um molde vazio com a coluna de destino preenchida
+    setSelectedTask({ columnId, title: '', description: '', tags: [], assignees: [], priority: '' });
+    setIsModalOpen(true);
+  };
+
+  const handleSave = (task) => {
+    saveTask(task);
+    loadData();
+    setIsModalOpen(false);
+  };
+
+  const handleDelete = (id) => {
+    deleteTask(id);
+    loadData();
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="flex-1 overflow-auto bg-prime-board-bg px-7 py-6">
       <div className="flex gap-5 items-start min-h-full">
         {columnsData.map((col) => (
-          <TaskColumn 
-            key={col.id} 
+          <TaskColumn
+            key={col.id}
             title={col.title}
             count={col.tasks.length}
             tasks={col.tasks}
-            onCardClick={onCardClick}
+            onCardClick={handleCardClick}
+            onAddClick={() => handleAddCard(col.id)}
           />
         ))}
 
@@ -37,8 +61,17 @@ const Board = ({ onCardClick }) => {
           <Plus className="w-[22px] h-[22px]" />
         </button>
       </div>
+
+      <TaskModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        task={selectedTask}
+        onSave={handleSave}
+        onDelete={handleDelete}
+      />
     </div>
   );
 };
 
 export default Board;
+
