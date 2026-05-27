@@ -188,7 +188,29 @@ const TaskModal = ({ isOpen, onClose, task, onSave, onDelete }) => {
               </button>
             )}
           </div>
-          <button onClick={() => onSave(formData)} className="bg-prime-azul text-white border-none rounded-btn h-10 px-9 font-sans text-[15px] font-semibold cursor-pointer transition-colors hover:bg-[#0d5878]">
+          <button 
+            onClick={() => {
+              const today = new Date().toISOString().split('T')[0];
+              if (!formData.title || !formData.startDate || !formData.endDate || !formData.priority || !formData.assignees || formData.assignees.length === 0) {
+                alert('Verifique os campos obrigatórios: Título, Início, Prazo, Prioridade e pelo menos um colaborador.');
+                return;
+              }
+              if (formData.startDate < today) {
+                alert('A data de início não pode ser anterior ao dia de hoje.');
+                return;
+              }
+              if (formData.endDate < today) {
+                alert('A data final não pode ser anterior ao dia de hoje.');
+                return;
+              }
+              if (formData.endDate < formData.startDate) {
+                alert('A data final não pode ser anterior à data de início.');
+                return;
+              }
+              onSave(formData);
+            }} 
+            className="bg-prime-azul text-white border-none rounded-btn h-10 px-9 font-sans text-[15px] font-semibold cursor-pointer transition-colors hover:bg-[#0d5878]"
+          >
             {formData.id ? 'Salvar Tarefa' : 'Criar Tarefa'}
           </button>
         </div>

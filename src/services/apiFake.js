@@ -54,9 +54,17 @@ export const saveTask = (task) => {
     tasks = tasks.map(t => t.id === task.id ? task : t);
   } else {
     // Create new
+    // Formato sugerido: 3 Letras, traço, 4 números aleatórios (Ex: TSK-0123)
+    const randomLetters = String.fromCharCode(
+      65 + Math.floor(Math.random() * 26),
+      65 + Math.floor(Math.random() * 26),
+      65 + Math.floor(Math.random() * 26)
+    );
+    const randomNumbers = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    
     const newTask = {
       ...task,
-      id: `t-${Math.floor(Math.random() * 10000)}`,
+      id: `${randomLetters}-${randomNumbers}`,
       createdAt: new Date().toISOString()
     };
     tasks.push(newTask);
@@ -93,5 +101,21 @@ export const createColumn = (title, projectId) => {
   columns.push(newCol);
   saveToStorage();
   return newCol;
+};
+
+export const updateColumn = (columnId, newTitle) => {
+  columns = columns.map(c => c.id === columnId ? { ...c, title: newTitle } : c);
+  saveToStorage();
+};
+
+export const deleteColumn = (columnId) => {
+  const col = columns.find(c => c.id === columnId);
+  if (col) {
+    // Delete all tasks inside this column
+    tasks = tasks.filter(t => !col.taskIds.includes(t.id));
+    // Remove the column
+    columns = columns.filter(c => c.id !== columnId);
+    saveToStorage();
+  }
 };
 

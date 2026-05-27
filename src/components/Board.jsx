@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import TaskColumn from './TaskColumn';
 import TaskModal from './TaskModal';
-import { getColumnsData, saveTask, deleteTask, createColumn } from '../services/apiFake';
+import { getColumnsData, saveTask, deleteTask, createColumn, updateColumn, deleteColumn } from '../services/apiFake';
 
 const Board = ({ currentProjectId }) => {
   const [columnsData, setColumnsData] = useState([]);
@@ -51,6 +51,21 @@ const Board = ({ currentProjectId }) => {
     }
   };
 
+  const handleEditColumn = (colId, currentTitle) => {
+    const title = window.prompt('Renomear coluna:', currentTitle);
+    if (title && title.trim() && title !== currentTitle) {
+      updateColumn(colId, title.trim());
+      loadData();
+    }
+  };
+
+  const handleDeleteColumn = (colId) => {
+    if (window.confirm('Tem certeza que deseja excluir esta coluna? Todas as tarefas nela serão apagadas.')) {
+      deleteColumn(colId);
+      loadData();
+    }
+  };
+
   return (
     <div className="flex-1 overflow-auto bg-prime-board-bg px-7 py-6">
       <div className="flex gap-5 items-start min-h-full">
@@ -62,6 +77,8 @@ const Board = ({ currentProjectId }) => {
             tasks={col.tasks} 
             onCardClick={handleCardClick}
             onAddClick={() => handleAddCard(col.id)}
+            onEditColumn={() => handleEditColumn(col.id, col.title)}
+            onDeleteColumn={() => handleDeleteColumn(col.id)}
           />
         ))}
 
