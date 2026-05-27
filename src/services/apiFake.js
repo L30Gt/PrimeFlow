@@ -108,6 +108,25 @@ export const updateColumn = (columnId, newTitle) => {
   saveToStorage();
 };
 
+export const moveTask = (taskId, sourceColumnId, destColumnId) => {
+  if (sourceColumnId === destColumnId) return;
+
+  const sourceCol = columns.find(c => c.id === sourceColumnId);
+  const destCol = columns.find(c => c.id === destColumnId);
+  const task = tasks.find(t => t.id === taskId);
+
+  if (sourceCol && destCol && task) {
+    // Remove from source col
+    sourceCol.taskIds = sourceCol.taskIds.filter(id => id !== taskId);
+    // Add to dest col
+    destCol.taskIds.push(taskId);
+    // Update task's columnId
+    task.columnId = destColumnId;
+
+    saveToStorage();
+  }
+};
+
 export const deleteColumn = (columnId) => {
   const col = columns.find(c => c.id === columnId);
   if (col) {

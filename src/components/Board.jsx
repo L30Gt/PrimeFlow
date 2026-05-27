@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import TaskColumn from './TaskColumn';
 import TaskModal from './TaskModal';
-import { getColumnsData, saveTask, deleteTask, createColumn, updateColumn, deleteColumn } from '../services/apiFake';
+import { getColumnsData, saveTask, deleteTask, createColumn, updateColumn, deleteColumn, moveTask } from '../services/apiFake';
 
 const Board = ({ currentProjectId }) => {
   const [columnsData, setColumnsData] = useState([]);
@@ -66,12 +66,33 @@ const Board = ({ currentProjectId }) => {
     }
   };
 
+  const handleDragStart = (e, taskId, sourceColumnId) => {
+    e.dataTransfer.setData('taskId', taskId);
+    e.dataTransfer.setData('sourceColumnId', sourceColumnId);
+  };
+
+  const handleDrop = (e, destColumnId) => {
+    e.preventDefault();
+    const taskId = e.dataTransfer.getData('taskId');
+    const sourceColumnId = e.dataTransfer.getData('sourceColumnId');
+
+    if (taskId && sourceColumnId && sourceColumnId !== destColumnId) {
+      moveTask(taskId, sourceColumnId, destColumnId);
+      loadData();
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault(); // Necessário para permitir o drop
+  };
+
   return (
     <div className="flex-1 overflow-auto bg-prime-board-bg px-7 py-6">
       <div className="flex gap-5 items-start min-h-full">
         {columnsData.map((col) => (
           <TaskColumn 
             key={col.id} 
+            id={col.id}
             title={col.title} 
             count={col.tasks.length} 
             tasks={col.tasks} 
@@ -79,6 +100,9 @@ const Board = ({ currentProjectId }) => {
             onAddClick={() => handleAddCard(col.id)}
             onEditColumn={() => handleEditColumn(col.id, col.title)}
             onDeleteColumn={() => handleDeleteColumn(col.id)}
+            onDragStart={handleDragStart}
+            onDrop={(e) => handleDrop(e, col.id)}
+            onDragOver={handleDragOver}
           />
         ))}
 
