@@ -19,5 +19,19 @@ export const columns = [
     title: 'Concluído',
     taskIds: [],
     createdAt: '2026-05-01T10:00:00.000Z'
+  },
+  {
+    id: 'col-004',
+    projectId: 'proj-002',
+    title: 'Backlog (Proj 2)',
+    taskIds: ['t-004'],
+    createdAt: '2026-05-27T10:00:00.000Z'
+  },
+  {
+    id: 'col-005',
+    projectId: 'proj-002',
+    title: 'Feito (Proj 2)',
+    taskIds: ['t-005'],
+    createdAt: '2026-05-27T10:00:00.000Z'
   }
 ];

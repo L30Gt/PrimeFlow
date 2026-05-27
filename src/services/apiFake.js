@@ -4,7 +4,16 @@ const loadFromStorage = (key, defaultData) => {
   const stored = localStorage.getItem(key);
   if (stored) {
     try {
-      return JSON.parse(stored);
+      const parsed = JSON.parse(stored);
+      // Merge missing items so new test projects/tasks load properly
+      const parsedIds = new Set(parsed.map(i => i.id));
+      const missing = defaultData.filter(d => !parsedIds.has(d.id));
+      if (missing.length > 0) {
+        const merged = [...parsed, ...missing];
+        localStorage.setItem(key, JSON.stringify(merged));
+        return merged;
+      }
+      return parsed;
     } catch (e) {
       console.error('Error parsing localStorage for', key, e);
     }
@@ -31,8 +40,9 @@ export const getProjectById = (projectId) => {
   return projects.find(p => p.id === projectId);
 };
 
-export const getColumnsData = () => {
-  return columns.map(col => ({
+export const getColumnsData = (projectId) => {
+  const projectColumns = columns.filter(col => col.projectId === projectId);
+  return projectColumns.map(col => ({
     ...col,
     tasks: col.taskIds.map(taskId => tasks.find(t => t.id === taskId)).filter(Boolean)
   }));

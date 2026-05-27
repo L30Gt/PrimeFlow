@@ -23,7 +23,7 @@ function App() {
       />
       <main className="flex-1 min-w-0 w-full flex flex-col overflow-hidden">
         <Header currentProject={currentProject} />
-        <Board />
+        <Board currentProjectId={currentProjectId} />
       </main>
     </div>
   );

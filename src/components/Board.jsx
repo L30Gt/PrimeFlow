@@ -4,18 +4,20 @@ import TaskColumn from './TaskColumn';
 import TaskModal from './TaskModal';
 import { getColumnsData, saveTask, deleteTask, createColumn } from '../services/apiFake';
 
-const Board = () => {
+const Board = ({ currentProjectId }) => {
   const [columnsData, setColumnsData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   
   const loadData = () => {
-    setColumnsData(getColumnsData());
+    if (currentProjectId) {
+      setColumnsData(getColumnsData(currentProjectId));
+    }
   };
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [currentProjectId]);
 
   const handleCardClick = (task) => {
     setSelectedTask(task);
@@ -23,8 +25,8 @@ const Board = () => {
   };
 
   const handleAddCard = (columnId) => {
-    // Passa um molde vazio com a coluna de destino preenchida
-    setSelectedTask({ columnId, title: '', description: '', tags: [], assignees: [], priority: '' });
+    // Passa um molde vazio com a coluna de destino e o projeto preenchidos
+    setSelectedTask({ projectId: currentProjectId, columnId, title: '', description: '', tags: [], assignees: [], priority: '' });
     setIsModalOpen(true);
   };
 
@@ -42,9 +44,9 @@ const Board = () => {
 
   const handleAddColumn = () => {
     const title = window.prompt('Digite o nome da nova coluna:');
-    if (title && title.trim()) {
+    if (title && title.trim() && currentProjectId) {
       // Vincula automaticamente ao projeto atual
-      createColumn(title.trim(), 'proj-001');
+      createColumn(title.trim(), currentProjectId);
       loadData();
     }
   };

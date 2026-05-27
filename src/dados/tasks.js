@@ -43,5 +43,35 @@ export const tasks = [
     createdBy: 'usr-001',
     createdAt: '2026-05-12T11:00:00.000Z',
     comments: []
+  },
+  {
+    id: 't-004',
+    projectId: 'proj-002',
+    columnId: 'col-004',
+    title: 'Estudar React',
+    description: 'Tarefa do novo projeto',
+    tags: ['tag-002'],
+    startDate: '2026-05-27',
+    endDate: '2026-05-30',
+    priority: 'Alta',
+    assignees: ['usr-001'],
+    createdBy: 'usr-001',
+    createdAt: '2026-05-27T10:00:00.000Z',
+    comments: []
+  },
+  {
+    id: 't-005',
+    projectId: 'proj-002',
+    columnId: 'col-005',
+    title: 'Ajustar layout P2',
+    description: 'Requisitos do cliente',
+    tags: ['tag-001'],
+    startDate: '2026-05-27',
+    endDate: '2026-05-28',
+    priority: 'Baixa',
+    assignees: ['usr-001'],
+    createdBy: 'usr-001',
+    createdAt: '2026-05-27T11:00:00.000Z',
+    comments: []
   }
 ];
