@@ -16,12 +16,12 @@ function App() {
 
   return (
     <div className="flex w-full min-h-screen">
-      <Sidebar 
-        projects={projects} 
-        currentProjectId={currentProjectId} 
+      <Sidebar
+        projects={projects}
+        currentProjectId={currentProjectId}
         onSelectProject={setCurrentProjectId}
       />
-      <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
+      <main className="flex-1 min-w-0 w-full flex flex-col overflow-hidden">
         <Header currentProject={currentProject} />
         <Board />
       </main>

@@ -1,8 +1,27 @@
 import { tasks as initialTasks, columns as initialColumns, projects as initialProjects } from '../dados';
 
-let tasks = [...initialTasks];
-let columns = [...initialColumns];
-let projects = [...initialProjects];
+const loadFromStorage = (key, defaultData) => {
+  const stored = localStorage.getItem(key);
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      console.error('Error parsing localStorage for', key, e);
+    }
+  }
+  localStorage.setItem(key, JSON.stringify(defaultData));
+  return [...defaultData];
+};
+
+let tasks = loadFromStorage('primeflow_tasks', initialTasks);
+let columns = loadFromStorage('primeflow_columns', initialColumns);
+let projects = loadFromStorage('primeflow_projects', initialProjects);
+
+const saveToStorage = () => {
+  localStorage.setItem('primeflow_tasks', JSON.stringify(tasks));
+  localStorage.setItem('primeflow_columns', JSON.stringify(columns));
+  localStorage.setItem('primeflow_projects', JSON.stringify(projects));
+};
 
 export const getProjects = () => {
   return projects;
@@ -38,8 +57,10 @@ export const saveTask = (task) => {
     if (col) {
       col.taskIds.push(newTask.id);
     }
+    saveToStorage();
     return newTask;
   }
+  saveToStorage();
   return task;
 };
 
@@ -48,6 +69,7 @@ export const deleteTask = (taskId) => {
   columns.forEach(col => {
     col.taskIds = col.taskIds.filter(id => id !== taskId);
   });
+  saveToStorage();
 };
 
 export const createColumn = (title, projectId) => {
@@ -59,6 +81,7 @@ export const createColumn = (title, projectId) => {
     createdAt: new Date().toISOString()
   };
   columns.push(newCol);
+  saveToStorage();
   return newCol;
 };
 
