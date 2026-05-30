@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1440" />
+<title>Gerenciador de Tarefas — Desktop 1440px</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #F4F5F7;
+    --surface:    #FFFFFF;
+    --border:     #E4E6EA;
+    --text-1:     #111827;
+    --text-2:     #6B7280;
+    --text-3:     #9CA3AF;
+    --accent:     #2D3648;
+    --accent-h:   #1a2133;
+    --doing:      #3B82F6;
+    --done:       #22C55E;
+    --custom:     #F59E0B;
+    --todo:       #D1D5DB;
+    --danger:     #EF4444;
+    --tag-feat-bg:#DBEAFE; --tag-feat-c:#1D4ED8;
+    --tag-bug-bg: #FEE2E2; --tag-bug-c: #DC2626;
+    --tag-grp-bg: #F3F4F6; --tag-grp-c: #374151;
+    --radius-sm:  6px;
+    --radius-md:  10px;
+    --radius-lg:  14px;
+    --shadow-card:0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    --sidebar-w:  268px;
+    --font:       'DM Sans', system-ui, sans-serif;
+    --font-mono:  'DM Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text-1);
+    min-width: 1440px;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ── SIDEBAR ─────────────────────────────────────────── */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 20px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .brand-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    color: var(--text-2);
+  }
+  .brand-icon svg { width: 20px; height: 20px; }
+  .brand-text .app-name { font-size: 14px; font-weight: 600; color: var(--text-1); line-height: 1.2; }
+  .brand-text .app-sub  { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+
+  .sidebar-section { padding: 20px 16px 0; }
+  .sidebar-label {
+    font-size: 10px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--text-3);
+    padding: 0 4px; margin-bottom: 6px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 10px; height: 36px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 500; color: var(--text-2);
+    cursor: pointer; transition: background .15s, color .15s;
+    user-select: none;
+  }
+  .nav-item:hover { background: var(--bg); color: var(--text-1); }
+  .nav-item.active { background: var(--accent); color: #fff; }
+  .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+  .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  .nav-item .nav-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-3); flex-shrink: 0;
+  }
+  .nav-item.active .nav-dot { background: #fff; }
+  .nav-item .nav-badge {
+    margin-left: auto; font-size: 11px; font-weight: 600;
+    background: rgba(255,255,255,.15); border-radius: 20px;
+    padding: 0 6px; line-height: 18px;
+  }
+  .nav-item:not(.active) .nav-badge { background: var(--bg); color: var(--text-2); }
+
+  .nav-add {
+    display: flex; align-items: center; gap: 6px;
+    padding: 0 10px; height: 34px; border-radius: var(--radius-sm);
+    font-size: 12px; color: var(--text-3); cursor: pointer;
+    transition: color .15s;
+    margin-top: 4px;
+  }
+  .nav-add:hover { color: var(--text-1); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px;
+  }
+  .avatar-sm {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    display: grid; place-items: center;
+    font-size: 13px; font-weight: 600; flex-shrink: 0;
+  }
+  .footer-user { flex: 1; min-width: 0; }
+  .footer-user .u-name { font-size: 13px; font-weight: 500; color: var(--text-1); }
+  .footer-user .u-role { font-size: 11px; color: var(--text-3); }
+  .logout-btn {
+    width: 30px; height: 30px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    display: grid; place-items: center; cursor: pointer;
+    color: var(--text-3); transition: color .15s, border-color .15s;
+    background: transparent;
+  }
+  .logout-btn:hover { color: var(--danger); border-color: var(--danger); }
+  .logout-btn svg { width: 15px; height: 15px; }
+
+  /* ── MAIN ─────────────────────────────────────────────── */
+  .main {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column;
+    overflow: auto;
+  }
+
+  /* ── TOPBAR ───────────────────────────────────────────── */
+  .topbar {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 28px 32px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .breadcrumb {
+    font-size: 12px; color: var(--text-3); margin-bottom: 4px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .breadcrumb b { color: var(--text-2); font-weight: 500; }
+  .page-title { font-size: 20px; font-weight: 600; color: var(--text-1); }
+  .topbar-actions { display: flex; gap: 8px; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 36px; padding: 0 14px; border-radius: var(--radius-sm);
+    font-family: var(--font); font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: background .15s, border-color .15s;
+    border: 1px solid transparent; white-space: nowrap;
+  }
+  .btn svg { width: 14px; height: 14px; }
+  .btn-outline {
+    background: var(--surface); border-color: var(--border);
+    color: var(--text-1);
+  }
+  .btn-outline:hover { background: var(--bg); }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { background: var(--accent-h); }
+
+  /* ── CONTENT ─────────────────────────────────────────── */
+  .content { padding: 24px 32px; flex: 1; }
+
+  /* Project card */
+  .project-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 20px;
+    display: flex; gap: 20px; align-items: flex-start;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-card);
+  }
+  .project-thumb {
+    width: 88px; height: 88px; border-radius: var(--radius-md);
+    background: var(--bg); border: 1px solid var(--border);
+    display: grid; place-items: center; flex-shrink: 0;
+    color: var(--text-3);
+  }
+  .project-thumb svg { width: 32px; height: 32px; }
+  .project-info { flex: 1; min-width: 0; }
+  .project-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .project-desc {
+    font-size: 13px; color: var(--text-2); line-height: 1.55;
+    max-width: 580px; /* ~80 chars per line — legible */
+  }
+
+  /* Collaborators */
+  .collabs-row {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 24px;
+  }
+  .collabs-label { font-size: 13px; font-weight: 500; color: var(--text-1); }
+  .avatar-group { display: flex; align-items: center; }
+  .avatar-group .av {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 2px solid var(--surface);
+    margin-left: -8px; first-of-type { margin-left: 0; }
+    display: grid; place-items: center;
+    font-size: 11px; font-weight: 600;
+    background: var(--accent); color: #fff;
+    cursor: pointer; transition: transform .15s;
+  }
+  .avatar-group .av:first-child { margin-left: 0; }
+  .avatar-group .av:hover { transform: translateY(-2px); z-index: 1; }
+  .av-add {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 2px dashed var(--border);
+    margin-left: -8px;
+    background: var(--surface); color: var(--text-3);
+    display: grid; place-items: center;
+    font-size: 16px; cursor: pointer; transition: color .15s;
+  }
+  .av-add:hover { color: var(--text-1); }
+  .collabs-count { font-size: 12px; color: var(--text-3); }
+
+  /* ── KANBAN ────────────────────────────────────────────── */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .column {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+  }
+  .col-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px 16px 13px;
+    border-bottom: 1px solid var(--border);
+  }
+  .col-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .col-title { font-size: 13px; font-weight: 600; color: var(--text-1); flex: 1; }
+  .col-badge {
+    font-size: 11px; font-weight: 600;
+    background: var(--bg); border-radius: 20px;
+    padding: 1px 7px; color: var(--text-2);
+    border: 1px solid var(--border);
+  }
+  .col-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+
+  /* Task card */
+  .task-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    cursor: pointer;
+    transition: box-shadow .15s, border-color .15s;
+  }
+  .task-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    border-color: #C7CAD3;
+  }
+  .tags { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
+  .tag {
+    font-size: 10px; font-weight: 600; letter-spacing: .02em;
+    padding: 2px 7px; border-radius: 20px; line-height: 16px;
+  }
+  .tag-feature { background: var(--tag-feat-bg); color: var(--tag-feat-c); }
+  .tag-bug     { background: var(--tag-bug-bg);  color: var(--tag-bug-c); }
+  .tag-grupo   { background: var(--tag-grp-bg);  color: var(--tag-grp-c); }
+  .task-title  { font-size: 13px; font-weight: 500; color: var(--text-1); margin-bottom: 4px; }
+  .task-desc   { font-size: 12px; color: var(--text-3); line-height: 1.45; margin-bottom: 12px; }
+
+  .task-meta { display: flex; align-items: center; gap: 8px; margin-top: auto; }
+  .progress-wrap { flex: 1; }
+  .progress-track {
+    height: 3px; background: var(--bg);
+    border-radius: 2px; overflow: hidden; margin-bottom: 3px;
+  }
+  .progress-fill { height: 100%; border-radius: 2px; background: var(--doing); }
+  .progress-fill.done { background: var(--done); }
+  .progress-fill.zero { background: var(--border); }
+  .progress-pct { font-size: 10px; color: var(--text-3); font-family: var(--font-mono); }
+
+  .task-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid var(--bg);
+  }
+  .task-assignees { display: flex; }
+  .task-assignees .tav {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--surface);
+    margin-left: -5px; background: var(--accent); color: #fff;
+    display: grid; place-items: center; font-size: 9px; font-weight: 700;
+  }
+  .task-assignees .tav:first-child { margin-left: 0; }
+  .tav-b { background: #2563EB; }
+  .tav-r { background: #DC2626; }
+  .tav-g { background: #16A34A; }
+
+  .task-date {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 11px; color: var(--text-3);
+  }
+  .task-date svg { width: 12px; height: 12px; }
+
+  /* Add task btn */
+  .add-task-btn {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    height: 36px; border-radius: var(--radius-sm);
+    border: 1.5px dashed var(--border);
+    font-size: 12px; font-weight: 500; color: var(--text-3);
+    cursor: pointer; transition: border-color .15s, color .15s;
+  }
+  .add-task-btn:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ─── SIDEBAR ─── -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-5"/></svg>
+    </div>
+    <div class="brand-text">
+      <div class="app-name">{NomeApp}</div>
+      <div class="app-sub">Gerenciador de Tarefas</div>
+    </div>
+  </div>
+
+  <div class="sidebar-section" style="margin-top:16px">
+    <div class="sidebar-label">Workspace</div>
+    <div class="nav-item active">
+      <span class="nav-dot"></span>
+      Tarefas
+    </div>
+    <div class="nav-item">
+      <span class="nav-dot"></span>
+      Calendário
+    </div>
+  </div>
+
+  <hr class="sidebar-divider" />
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Projetos</div>
+    <div class="nav-item active">
+      <span class="nav-dot"></span>
+      Projeto de Web II
+      <span class="nav-badge">9</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-dot"></span>
+      App de Finanças
+    </div>
+    <div class="nav-item">
+      <span class="nav-dot"></span>
+      Portfolio
+    </div>
+    <div class="nav-item">
+      <span class="nav-dot"></span>
+      Ling de Programação II
+    </div>
+    <div class="nav-add">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+      Novo Projeto
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="avatar-sm">U</div>
+    <div class="footer-user">
+      <div class="u-name">{Usuário}</div>
+      <div class="u-role">Membro</div>
+    </div>
+    <button class="logout-btn" title="Sair">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </div>
+</aside>
+
+<!-- ─── MAIN ─── -->
+<main class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div>
+      <div class="breadcrumb">Projetos / <b>Projeto de Web II</b></div>
+      <h1 class="page-title">Projeto de Web II</h1>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-outline">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
+        Filtro
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <button class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nova Tarefa
+      </button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- Project card -->
+    <div class="project-card">
+      <div class="project-thumb">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </div>
+      <div class="project-info">
+        <div class="project-name">Projeto de Web II — Gerenciador de Tarefas (Grupo 2)</div>
+        <div class="project-desc">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu enim ac ipsum vehicula faucibus sed vel mi. Sed iaculis dui eu lectus sagittis ornare. Aenean aliquet arcu ac egestas eleifend. Cras urna enim, mattis ac est nec, interdum euismod nibh.
+        </div>
+      </div>
+    </div>
+
+    <!-- Collaborators -->
+    <div class="collabs-row">
+      <span class="collabs-label">Colaboradores</span>
+      <div class="avatar-group">
+        <div class="av" style="background:#2D3648" title="Usuário 1">U1</div>
+        <div class="av" style="background:#2563EB" title="Usuário 2">U2</div>
+        <div class="av" style="background:#16A34A" title="Usuário 3">U3</div>
+        <div class="av" style="background:#7C3AED" title="Usuário 4">U4</div>
+        <div class="av-add" title="Adicionar membro">+</div>
+      </div>
+      <span class="collabs-count">4 Membros</span>
+    </div>
+
+    <!-- Board -->
+    <div class="board">
+
+      <!-- TO-DO -->
+      <div class="column">
+        <div class="col-header">
+          <span class="col-dot" style="background:var(--todo)"></span>
+          <span class="col-title">To-Do</span>
+          <span class="col-badge">2</span>
+        </div>
+        <div class="col-body">
+
+          <div class="task-card">
+            <div class="tags"><span class="tag tag-feature">Feature</span></div>
+            <div class="task-title">Criar página inicial</div>
+            <div class="task-desc">Estruturar layout, seção de tarefas e menus</div>
+            <div class="progress-wrap">
+              <div class="progress-track"><div class="progress-fill zero" style="width:0%"></div></div>
+            </div>
+            <div class="task-footer">
+              <div class="task-assignees">
+                <div class="tav">U</div>
+              </div>
+              <div class="task-date">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                20 jun · 0%
+              </div>
+            </div>
+          </div>
+
+          <div class="task-card">
+            <div class="tags">
+              <span class="tag tag-bug">Bug</span>
+              <span class="tag tag-grupo">Grupo</span>
+            </div>
+            <div class="task-title">Corrigir layout mobile</div>
+            <div class="task-desc">Mobile não está responsivo. Arrumar CSS para Desktop e Mobile</div>
+            <div class="progress-wrap">
+              <div class="progress-track"><div class="progress-fill zero" style="width:0%"></div></div>
+            </div>
+            <div class="task-footer">
+              <div class="task-assignees">
+                <div class="tav tav-b">U</div>
+                <div class="tav tav-r">U</div>
+              </div>
+              <div class="task-date">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                20 jun · 0%
+              </div>
+            </div>
+          </div>
+
+          <div class="add-task-btn">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+            Nova Tarefa
+          </div>
+        </div>
+      </div>
+
+      <!-- DOING -->
+      <div class="column">
+        <div class="col-header">
+          <span class="col-dot" style="background:var(--doing)"></span>
+          <span class="col-title">Doing</span>
+          <span class="col-badge">1</span>
+        </div>
+        <div class="col-body">
+
+          <div class="task-card">
+            <div class="tags"><span class="tag tag-feature">Feature</span></div>
+            <div class="task-title">Título da Tarefa</div>
+            <div class="task-desc">Descrição da tarefa em andamento</div>
+            <div class="progress-wrap">
+              <div class="progress-track"><div class="progress-fill" style="width:70%"></div></div>
+            </div>
+            <div class="task-footer">
+              <div class="task-assignees">
+                <div class="tav">U</div>
+              </div>
+              <div class="task-date">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                20 jun · 70%
+              </div>
+            </div>
+          </div>
+
+          <div class="add-task-btn">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+            Nova Tarefa
+          </div>
+        </div>
+      </div>
+
+      <!-- PERSONALIZADO -->
+      <div class="column">
+        <div class="col-header">
+          <span class="col-dot" style="background:var(--custom)"></span>
+          <span class="col-title">Personalizado</span>
+          <span class="col-badge">4</span>
+        </div>
+        <div class="col-body">
+
+          <div class="task-card">
+            <div class="tags"><span class="tag tag-feature">Feature</span></div>
+            <div class="task-title">Tarefa 1</div>
+            <div class="task-desc">Descrição da Tarefa</div>
+            <div class="progress-wrap">
+              <div class="progress-track"><div class="progress-fill zero" style="width:0%"></div></div>
+            </div>
+            <div class="task-footer">
+              <div class="task-assignees"><div class="tav">U</div></div>
+              <div class="task-date">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                20 jun · 0%
+              </div>
+            </div>
+          </div>
+
+          <div class="task-card">
+            <div class="tags"><span class="tag tag-bug">Bug</span></div>
+            <div class="task-title">Tarefa 2</div>
+            <div class="task-desc">Descrição da Tarefa</div>
+            <div class="progress-wrap">
+              <div class="progress-track"><div class="progress-fill zero" style="width:0%"></div></div>
+            </div>
+            <div class="task-footer">
+              <div class="task-assignees">
+                <div class="tav tav-b">U</div>
+                <div class="tav tav-r">U</div>
+              </div>
+              <div class="task-date">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                20 jun · 0%
+              </div>
+            </div>
+          </div>
+
+          <div class="task-card">
+            <div class="tags"><span class="tag tag-bug">Bug</span></div>
+            <div class="task-title">Tarefa 3</div>
+            <div class="task-desc">Mobile não está responsivo. Arrumar CSS para Desktop e Mobile</div>
+            <div class="progress-wrap">
+              <div class="progress-track"><div class="progress-fill zero" style="width:0%"></div></div>
+            </div>
+            <div class="task-footer">
+              <div class="task-assignees">
+                <div class="tav tav-b">U</div>
+                <div class="tav tav-r">U</div>
+              </div>
+              <div class="task-date">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                20 jun · 0%
+              </div>
+            </div>
+          </div>
+
+          <div class="task-card">
+            <div class="tags"><span class="tag tag-bug">Bug</span></div>
+            <div class="task-title">Tarefa 4</div>
+            <div class="task-desc">Mobile não está responsivo. Arrumar CSS para Desktop e Mobile</div>
+            <div class="progress-wrap">
+              <div class="progress-track"><div class="progress-fill zero" style="width:0%"></div></div>
+            </div>
+            <div class="task-footer">
+              <div class="task-assignees">
+                <div class="tav tav-b">U</div>
+                <div class="tav tav-r">U</div>
+              </div>
+              <div class="task-date">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                20 jun · 0%
+              </div>
+            </div>
+          </div>
+
+          <div class="add-task-btn">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+            Nova Tarefa
+          </div>
+        </div>
+      </div>
+
+      <!-- DONE -->
+      <div class="column">
+        <div class="col-header">
+          <span class="col-dot" style="background:var(--done)"></span>
+          <span class="col-title">Done</span>
+          <span class="col-badge">2</span>
+        </div>
+        <div class="col-body">
+
+          <div class="task-card" style="opacity:.75">
+            <div class="tags"><span class="tag tag-feature">Feature</span></div>
+            <div class="task-title" style="text-decoration:line-through;color:var(--text-3)">Tarefa Concluída</div>
+            <div class="task-desc">Descrição da Tarefa</div>
+            <div class="progress-wrap">
+              <div class="progress-track"><div class="progress-fill done" style="width:100%"></div></div>
+            </div>
+            <div class="task-footer">
+              <div class="task-assignees"><div class="tav">U</div></div>
+              <div class="task-date">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                20 jun · 100%
+              </div>
+            </div>
+          </div>
+
+          <div class="task-card" style="opacity:.75">
+            <div class="tags"><span class="tag tag-bug">Bug</span></div>
+            <div class="task-title" style="text-decoration:line-through;color:var(--text-3)">Tarefa 2 Concluída</div>
+            <div class="task-desc">Descrição da Tarefa</div>
+            <div class="progress-wrap">
+              <div class="progress-track"><div class="progress-fill done" style="width:100%"></div></div>
+            </div>
+            <div class="task-footer">
+              <div class="task-assignees">
+                <div class="tav tav-b">U</div>
+                <div class="tav tav-r">U</div>
+              </div>
+              <div class="task-date">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                20 jun · 100%
+              </div>
+            </div>
+          </div>
+
+          <div class="add-task-btn">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="13" height="13"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+            Nova Tarefa
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /board -->
+  </div><!-- /content -->
+</main>
+
+</body>
+</html>
