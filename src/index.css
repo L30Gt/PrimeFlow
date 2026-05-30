@@ -13,4 +13,8 @@
   body {
     @apply font-sans bg-prime-white text-prime-preto min-h-screen w-full flex m-0 p-0;
   }
+
+  #root {
+    @apply w-full;
+  }
 }
